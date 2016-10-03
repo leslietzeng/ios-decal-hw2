@@ -21,8 +21,8 @@ class ViewController: UIViewController {
     
     // TODO: This looks like a good place to add some data structures.
     //       One data structure is initialized below for reference.
-    var someDataStructure: [String] = [""]
-    
+    var someDataStructure: [String] = ["0"]
+    var totalSoFar: Double = 0;
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -46,25 +46,152 @@ class ViewController: UIViewController {
     // TODO: A method to update your data structure(s) would be nice.
     //       Modify this one or create your own.
     func updateSomeDataStructure(_ content: String) {
-        print("Update me like one of those PCs")
+        print("Update (DataStructure) me like one of those PCs")
+        someDataStructure.append(content);
+        if content == "C" {
+            someDataStructure.removeAll();
+            someDataStructure.append("0");
+            updateResultLabel(calculate());
+        }
     }
     
     // TODO: Ensure that resultLabel gets updated.
     //       Modify this one or create your own.
     func updateResultLabel(_ content: String) {
-        print("Update me like one of those PCs")
+        print("Update (ResultLabel) me like one of those PCs")
+        resultLabel.text = content;
     }
     
     
     // TODO: A calculate method with no parameters, scary!
     //       Modify this one or create your own.
+    //REDO
     func calculate() -> String {
-        return "0"
+        var total: Double = 0
+        var prevIsOperator: Bool = false;
+        var op: String = "";
+        for next in someDataStructure {
+            if let next = Double(next) {
+                //is an Int
+                if !prevIsOperator {
+                    let sign: Double = total < 0 ? -1 : 1
+                    total = (total * 10) + (sign * next);
+                } else {
+                    //make sure you can switch on String in swift.
+                    switch op {
+                    case "/":
+                        if next == 0 {break};
+                        total /= next;
+                        break;
+                    case "*":
+                        total *= next;
+                        break;
+                    case "-":
+                        total -= next;
+                        break;
+                    case "+":
+                        total += next;
+                        break;
+                    case "+/-":
+                        total *= -1;
+                        break;
+                    case "%":
+                        total /= 100.0;
+                        break;
+                    case "=":
+                        //IMPLEMENT
+                        break;
+                    default:
+                        break;
+                    }
+                    
+                }
+                prevIsOperator = false;
+                
+            } else {
+                //is an operator or special button
+                op = next;
+                prevIsOperator = true;
+                
+            }
+        }
+        let isInteger:Bool = (floor(total) == total);
+        if isInteger {
+            return String(Int(total));
+        }
+        return String(total);
+
+//        var total: Double = 0
+//        var enterDecimal: Bool = false;
+//        var multiplier: Double = 1;
+//        var op: String = "";
+//        for next in someDataStructure {
+//            if let next = Double(next) {
+//                //is a number
+//                let sign: Double = total < 0 ? -1 : 1
+//                if enterDecimal {
+//                    total = total + (multiplier * next);
+//                } else {
+//                    total = (total * 10) + (sign * next);
+//                }
+//
+//            } else {
+//                //FIX LOGIC
+//                //is an operator or special button
+//                switch next {
+//                    case ".":
+//                        enterDecimal = true;
+//                        multiplier /= 10;
+//                        break;
+//                    case "=":
+//                        totalSoFar = total;
+//                        break;
+//                    case "%":
+//                        totalSoFar /= 100.0;
+//                        break;
+//                    default:
+//                        break;
+//                    
+//                }
+//                switch op {
+//                    case "/":
+//                        if total == 0 {break};
+//                        totalSoFar /= total;
+//                        break;
+//                    case "*":
+//                        totalSoFar *= total;
+//                        break;
+//                    case "-":
+//                        totalSoFar -= total;
+//                        break;
+//                    case "+":
+//                        totalSoFar += total;
+//                        break;
+//                    case "+/-":
+//                        totalSoFar *= total;
+//                        break;
+//                    case "=":
+//                        //IMPLEMENT
+//                        break;
+//                    default:
+//                        break;
+//                    }
+//                    op = next;
+//                total = 0;
+//                
+//            }
+//        }
+//        let isInteger:Bool = (floor(totalSoFar) == totalSoFar);
+//        if isInteger {
+//            return String(Int(totalSoFar));
+//        }
+//        return String(totalSoFar);
     }
     
     // TODO: A simple calculate method for integers.
     //       Modify this one or create your own.
     func intCalculate(a: Int, b:Int, operation: String) -> Int {
+        //did not implement; dealt with by always doing double operations and converting to Int at end if applicable
         print("Calculation requested for \(a) \(operation) \(b)")
         return 0
     }
@@ -72,6 +199,7 @@ class ViewController: UIViewController {
     // TODO: A general calculate method for doubles
     //       Modify this one or create your own.
     func calculate(a: String, b:String, operation: String) -> Double {
+        //did not implement; dealt with by always doing double operations and converting to Int at end if applicable
         print("Calculation requested for \(a) \(operation) \(b)")
         return 0.0
     }
@@ -81,16 +209,24 @@ class ViewController: UIViewController {
         guard Int(sender.content) != nil else { return }
         print("The number \(sender.content) was pressed")
         // Fill me in!
+        updateSomeDataStructure(sender.content);
+        updateResultLabel(calculate());
+        
     }
     
     // REQUIRED: The responder to an operator button being pressed.
     func operatorPressed(_ sender: CustomButton) {
-        // Fill me in!
+        updateSomeDataStructure(sender.content);
+        
     }
     
     // REQUIRED: The responder to a number or operator button being pressed.
     func buttonPressed(_ sender: CustomButton) {
-       // Fill me in!
+        if Int(sender.content) == nil {
+            operatorPressed(sender);
+        } else {
+            numberPressed(sender);
+        }
     }
     
     // IMPORTANT: Do NOT change any of the code below.
