@@ -66,6 +66,7 @@ class ViewController: UIViewController {
     //       Modify this one or create your own.
     func updateResultLabel(_ content: String) {
         print("Update (ResultLabel) me like one of those PCs")
+        
         var index = content.index(content.startIndex, offsetBy: min(content.characters.count, 7))
         if (content.contains(".")) {
             index = content.index(content.startIndex, offsetBy: min(content.characters.count, 8))
@@ -193,11 +194,24 @@ class ViewController: UIViewController {
                     numberEntered = false;
                 }
                 currentOperator = "=";
+                let formatter = NumberFormatter();
+                formatter.usesSignificantDigits = true;
+                formatter.maximumSignificantDigits = 7;
                 if (floor(currentValue) == currentValue) {
-                    updateResultLabel(String(Int(currentValue)))
+                    if currentValue > 9999999 {
+                        formatter.numberStyle = .scientific
+                    }
+                    let newLabel:String? = formatter.string(from: NSNumber(value:Int(currentValue)))
+                    updateResultLabel(newLabel!)
                 } else {
-                    updateResultLabel(String(currentValue))
+                    if currentValue < 0.000001 || currentValue > 9999999 {
+                        formatter.numberStyle = .scientific
+                    }
+                    let newLabel:String? = formatter.string(from: NSNumber(value:currentValue))
+                    updateResultLabel(newLabel!)
+                    
                 }
+
                 break;
             case "+", "-", "/", "*", "=":
                 
@@ -227,10 +241,22 @@ class ViewController: UIViewController {
                             break;
                     }
                     print("currentValue: \(currentValue)");
+                    let formatter = NumberFormatter();
+                    formatter.usesSignificantDigits = true;
+                    formatter.maximumSignificantDigits = 7;
                     if (floor(currentValue) == currentValue) {
-                        updateResultLabel(String(Int(currentValue)))
+                        if currentValue > 9999999 {
+                            formatter.numberStyle = .scientific
+                        }
+                        let newLabel:String? = formatter.string(from: NSNumber(value:Int(currentValue)))
+                        updateResultLabel(newLabel!)
                     } else {
-                        updateResultLabel(String(currentValue))
+                        if currentValue < 0.000001 || currentValue > 9999999 {
+                            formatter.numberStyle = .scientific
+                        }
+                        let newLabel:String? = formatter.string(from: NSNumber(value:currentValue))
+                        updateResultLabel(newLabel!)
+                        
                     }
                     numberEntered = false;
                     
