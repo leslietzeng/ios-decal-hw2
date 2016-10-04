@@ -21,9 +21,14 @@ class ViewController: UIViewController {
     
     // TODO: This looks like a good place to add some data structures.
     //       One data structure is initialized below for reference.
-    var someDataStructure: [String] = ["0"]
-    var totalSoFar: Double = 0;
-
+    var someDataStructure: [String] = ["0"] //newly inputted number
+    var currentOperator:String = ""
+    var oldOperator:String = "";
+    var oldOperatorValue:Double = 0;
+    var currentValue:Double = 0;
+    var numberEntered:Bool = false;
+    var numCount: Int = 0;
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view = UIView(frame: UIScreen.main.bounds)
@@ -47,19 +52,26 @@ class ViewController: UIViewController {
     //       Modify this one or create your own.
     func updateSomeDataStructure(_ content: String) {
         print("Update (DataStructure) me like one of those PCs")
-        someDataStructure.append(content);
-        if content == "C" {
-            someDataStructure.removeAll();
-            someDataStructure.append("0");
-            updateResultLabel(calculate());
+        if (someDataStructure.count == 1 && someDataStructure[0] == "0") {
+            if content != "." {
+                someDataStructure.removeAll();
+                numCount = 0;
+            }
         }
+        someDataStructure.append(content)
+        
     }
     
     // TODO: Ensure that resultLabel gets updated.
     //       Modify this one or create your own.
     func updateResultLabel(_ content: String) {
         print("Update (ResultLabel) me like one of those PCs")
-        resultLabel.text = content;
+        var index = content.index(content.startIndex, offsetBy: min(content.characters.count, 7))
+        if (content.contains(".")) {
+            index = content.index(content.startIndex, offsetBy: min(content.characters.count, 8))
+        }
+            
+        resultLabel.text = content.substring(to: index)
     }
     
     
@@ -67,125 +79,8 @@ class ViewController: UIViewController {
     //       Modify this one or create your own.
     //REDO
     func calculate() -> String {
-        var total: Double = 0
-        var prevIsOperator: Bool = false;
-        var op: String = "";
-        for next in someDataStructure {
-            if let next = Double(next) {
-                //is an Int
-                if !prevIsOperator {
-                    let sign: Double = total < 0 ? -1 : 1
-                    total = (total * 10) + (sign * next);
-                } else {
-                    //make sure you can switch on String in swift.
-                    switch op {
-                    case "/":
-                        if next == 0 {break};
-                        total /= next;
-                        break;
-                    case "*":
-                        total *= next;
-                        break;
-                    case "-":
-                        total -= next;
-                        break;
-                    case "+":
-                        total += next;
-                        break;
-                    case "+/-":
-                        total *= -1;
-                        break;
-                    case "%":
-                        total /= 100.0;
-                        break;
-                    case "=":
-                        //IMPLEMENT
-                        break;
-                    default:
-                        break;
-                    }
-                    
-                }
-                prevIsOperator = false;
-                
-            } else {
-                //is an operator or special button
-                op = next;
-                prevIsOperator = true;
-                
-            }
-        }
-        let isInteger:Bool = (floor(total) == total);
-        if isInteger {
-            return String(Int(total));
-        }
-        return String(total);
+        return ""
 
-//        var total: Double = 0
-//        var enterDecimal: Bool = false;
-//        var multiplier: Double = 1;
-//        var op: String = "";
-//        for next in someDataStructure {
-//            if let next = Double(next) {
-//                //is a number
-//                let sign: Double = total < 0 ? -1 : 1
-//                if enterDecimal {
-//                    total = total + (multiplier * next);
-//                } else {
-//                    total = (total * 10) + (sign * next);
-//                }
-//
-//            } else {
-//                //FIX LOGIC
-//                //is an operator or special button
-//                switch next {
-//                    case ".":
-//                        enterDecimal = true;
-//                        multiplier /= 10;
-//                        break;
-//                    case "=":
-//                        totalSoFar = total;
-//                        break;
-//                    case "%":
-//                        totalSoFar /= 100.0;
-//                        break;
-//                    default:
-//                        break;
-//                    
-//                }
-//                switch op {
-//                    case "/":
-//                        if total == 0 {break};
-//                        totalSoFar /= total;
-//                        break;
-//                    case "*":
-//                        totalSoFar *= total;
-//                        break;
-//                    case "-":
-//                        totalSoFar -= total;
-//                        break;
-//                    case "+":
-//                        totalSoFar += total;
-//                        break;
-//                    case "+/-":
-//                        totalSoFar *= total;
-//                        break;
-//                    case "=":
-//                        //IMPLEMENT
-//                        break;
-//                    default:
-//                        break;
-//                    }
-//                    op = next;
-//                total = 0;
-//                
-//            }
-//        }
-//        let isInteger:Bool = (floor(totalSoFar) == totalSoFar);
-//        if isInteger {
-//            return String(Int(totalSoFar));
-//        }
-//        return String(totalSoFar);
     }
     
     // TODO: A simple calculate method for integers.
@@ -208,25 +103,195 @@ class ViewController: UIViewController {
     func numberPressed(_ sender: CustomButton) {
         guard Int(sender.content) != nil else { return }
         print("The number \(sender.content) was pressed")
+        //shouldn't have to calculate anything - just take what's in data structure and print to screen.
         // Fill me in!
-        updateSomeDataStructure(sender.content);
-        updateResultLabel(calculate());
+        numCount += 1;
+        handleInput(sender.content);
+        print("\(numCount)")
+        numberEntered = true;
         
+    }
+    
+    func handleInput(_ content: String) {
+        if numCount >= 7 {
+            print("\(dataStructureToDouble())")
+            return;
+        }
+        updateSomeDataStructure(content);
+        var inputtedNumber = "";
+        var inverse:Bool = false;
+        var decimalFlag:Bool = false;
+        for str in someDataStructure {
+            if str == "." {
+                if decimalFlag {
+                    continue;
+                }
+                decimalFlag = true;
+            }
+            if (str == "+/-") {
+                inverse = inverse ? false : true; //XOR
+            } else {
+                inputtedNumber.append(str);
+            }
+            
+        }
+        if inverse {
+            inputtedNumber = "-" + inputtedNumber;
+        }
+        updateResultLabel(inputtedNumber)
     }
     
     // REQUIRED: The responder to an operator button being pressed.
     func operatorPressed(_ sender: CustomButton) {
-        updateSomeDataStructure(sender.content);
+        switch sender.content {
+            case ".":
+                handleInput(sender.content)
+                break;
+            case "+/-":
+                handleInput(sender.content)
+                break;
+            case "C":
+                someDataStructure.removeAll();
+                numCount = 0;
+                //currentValue = dataStructureToDouble();
+                currentOperator = "";
+                currentValue = 0;
+                handleInput("0");
+                break;
+            
+            case "=":
+                print("\(currentOperator)\t\(oldOperator)\t\(oldOperatorValue)");
+                if currentOperator == "" {
+                    currentValue = dataStructureToDouble();
+                } else {
+                    let operatorVal:Double = currentOperator == "=" ? oldOperatorValue : dataStructureToDouble();
+                    let operatorToCompare:String = currentOperator == "=" ? oldOperator : currentOperator;
+                        switch operatorToCompare {
+                        case "+":
+                            currentValue += operatorVal;
+                            break;
+                        case "-":
+                            currentValue -= operatorVal;
+                            break;
+                        case "/":
+                            currentValue /= operatorVal;
+                            break;
+                        case "*":
+                            currentValue *= operatorVal;
+                            break;
+                        case "%":
+                            currentValue /= 100;
+                            break;
+                        default:
+                            break;
+                    }
+                    if currentOperator != "=" {
+                        oldOperator = currentOperator;
+                        print("UpdateOldOperator \(dataStructureToDouble())");
+                        oldOperatorValue = dataStructureToDouble();
+                    }
+                    numberEntered = false;
+                }
+                currentOperator = "=";
+                if (floor(currentValue) == currentValue) {
+                    updateResultLabel(String(Int(currentValue)))
+                } else {
+                    updateResultLabel(String(currentValue))
+                }
+                break;
+            case "+", "-", "/", "*", "=":
+                
+                    
+                if (currentOperator == "") {
+                    currentValue = dataStructureToDouble();
+                    print("currentValue: \(currentValue)");
+                } else if (numberEntered) {
+                    let operatorVal:Double = dataStructureToDouble();
+                    switch currentOperator {
+                        case "+":
+                            currentValue += operatorVal;
+                            break;
+                        case "-":
+                            currentValue -= operatorVal;
+                            break;
+                        case "/":
+                            currentValue /= operatorVal;
+                            break;
+                        case "*":
+                            currentValue *= operatorVal;
+                            break;
+                        case "%":
+                            currentValue /= 100;
+                            break;
+                        default:
+                            break;
+                    }
+                    print("currentValue: \(currentValue)");
+                    if (floor(currentValue) == currentValue) {
+                        updateResultLabel(String(Int(currentValue)))
+                    } else {
+                        updateResultLabel(String(currentValue))
+                    }
+                    numberEntered = false;
+                    
+                }
+                print("UpdateOldOperator \(dataStructureToDouble())");
+                oldOperatorValue = dataStructureToDouble();
+                
+                someDataStructure.removeAll();
+                numCount = 0;
+                someDataStructure.append("0");
+                currentOperator = sender.content;
+
+            
+            
+            default:
+                break;
+        }
         
     }
     
     // REQUIRED: The responder to a number or operator button being pressed.
     func buttonPressed(_ sender: CustomButton) {
-        if Int(sender.content) == nil {
+        if (Int(sender.content) == nil) {
             operatorPressed(sender);
         } else {
             numberPressed(sender);
         }
+    }
+    func dataStructureToDouble() -> Double {
+        var decimalFlag:Bool = false;
+        var multiplier:Double = 1;
+        var total:Double = 0;
+        var inverse:Bool = false;
+        for str in someDataStructure {
+            if let nextDigit = Double(str) {
+                let sign: Double = total < 0 ? -1 : 1
+                if decimalFlag {
+                    multiplier /= 10;
+                    total = total + (sign * multiplier * nextDigit)
+                } else {
+                    total = (total * 10) + (sign * nextDigit);
+                }
+            } else {
+                switch str {
+                    case ".":
+                        decimalFlag = true;
+                        break;
+                    
+                    case "+/-":
+                        inverse = inverse ? false : true;
+                        break;
+                    default:
+                        break;
+                }
+                    
+            }
+        }
+        if inverse {
+            return total * -1;
+        }
+        return total;
     }
     
     // IMPORTANT: Do NOT change any of the code below.
