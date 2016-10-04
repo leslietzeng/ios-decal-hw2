@@ -206,6 +206,7 @@ class ViewController: UIViewController {
                 } else {
                     if currentValue < 0.000001 || currentValue > 9999999 {
                         formatter.numberStyle = .scientific
+                        formatter.maximumSignificantDigits = 5;
                     }
                     let newLabel:String? = formatter.string(from: NSNumber(value:currentValue))
                     updateResultLabel(newLabel!)
@@ -253,6 +254,7 @@ class ViewController: UIViewController {
                     } else {
                         if currentValue < 0.000001 || currentValue > 9999999 {
                             formatter.numberStyle = .scientific
+                            formatter.maximumSignificantDigits = 5;
                         }
                         let newLabel:String? = formatter.string(from: NSNumber(value:currentValue))
                         updateResultLabel(newLabel!)
