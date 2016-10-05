@@ -66,12 +66,16 @@ class ViewController: UIViewController {
     //       Modify this one or create your own.
     func updateResultLabel(_ content: String) {
         print("Update (ResultLabel) me like one of those PCs")
-        
+        print(content)
         var index = content.index(content.startIndex, offsetBy: min(content.characters.count, 7))
-        if (content.contains(".")) {
+        if (content.localizedCaseInsensitiveContains("E")) {
+            print("Scientific")
+            index = content.index(content.startIndex, offsetBy: content.characters.count)
+
+        } else if (content.contains(".")) {
             index = content.index(content.startIndex, offsetBy: min(content.characters.count, 8))
         }
-            
+        print("index: \(index)")
         resultLabel.text = content.substring(to: index)
     }
     
@@ -260,9 +264,10 @@ class ViewController: UIViewController {
                         updateResultLabel(newLabel!)
                         
                     }
-                    numberEntered = false;
+                    
                     
                 }
+                numberEntered = false;
                 print("UpdateOldOperator \(dataStructureToDouble())");
                 oldOperatorValue = dataStructureToDouble();
                 
